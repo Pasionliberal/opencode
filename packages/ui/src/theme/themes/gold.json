@@ -1,0 +1,49 @@
+{
+  "$schema": "https://opencode.ai/desktop-theme.json",
+  "name": "Onyx & Gold",
+  "id": "gold",
+  "light": {
+    "palette": {
+      "neutral": "#FAF6EA",
+      "ink": "#211B10",
+      "primary": "#9C7615",
+      "accent": "#C4941F",
+      "success": "#3F7D5C",
+      "warning": "#C2660B",
+      "error": "#A3402B",
+      "info": "#5B7A99",
+      "diffAdd": "#3F7D5C",
+      "diffDelete": "#A3402B"
+    },
+    "overrides": {
+      "syntax-comment": "#8C7F5C",
+      "syntax-keyword": "#B5652E",
+      "syntax-string": "#6E8F52",
+      "syntax-primitive": "#5B7A99",
+      "syntax-property": "#9C7615",
+      "syntax-constant": "#8A6B9A"
+    }
+  },
+  "dark": {
+    "palette": {
+      "neutral": "#0E0C08",
+      "ink": "#F4EEDB",
+      "primary": "#E3B23C",
+      "accent": "#F4CB5C",
+      "success": "#5FBE8B",
+      "warning": "#D9772E",
+      "error": "#E08A65",
+      "info": "#7FA3C4",
+      "diffAdd": "#5FBE8B",
+      "diffDelete": "#E08A65"
+    },
+    "overrides": {
+      "syntax-comment": "#7D7150",
+      "syntax-keyword": "#D98A54",
+      "syntax-string": "#F0C765",
+      "syntax-primitive": "#8FB3D9",
+      "syntax-property": "#E3B23C",
+      "syntax-constant": "#C2A46B"
+    }
+  }
+}
