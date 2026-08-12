@@ -1,57 +1,39 @@
 # LED Screen Editor - Android
 
-App nativa Android en Kotlin para diseñar y animar pantallas LED.
+App Android nativa en Kotlin para diseñar pantallas LED.
 
 ## Características
 
-- 📐 **Editor de píxeles** - Grilla de 32x18 con herramientas de dibujo
-- 🎨 **Colores RGB** - 12 colores predefinidos
-- 📱 **Optimizado para móvil** - Touch-first, responsive
-- 🎬 **Animaciones** - Crea fotogramas y reproduce
-- 💾 **Exportar** - Guarda como imagen PNG o animación JSON
+✅ **Editor funcional** - Grilla 32x18, pincel y borrador
+✅ **Colores RGB** - 12 colores predefinidos
+✅ **Dibujo libre** - Sección sin restricciones con animaciones
+✅ **Exportar** - Descarga como PNG
+✅ **Touch optimizado** - Responde bien a toques continuos
 
-## Requisitos
+## Stack
 
-- Android 8.0+ (API 26)
-- Kotlin 1.9.x
-- Gradle 8.x
+- Kotlin + Jetpack Compose
+- CustomView para canvas responsivo
+- StateFlow para estado reactivo
 
-## Estructura
-
-```
-led-screen-android/
-├── src/main/
-│   ├── kotlin/com/ledscreen/editor/
-│   │   ├── MainActivity.kt
-│   │   ├── ui/
-│   │   │   ├── screens/
-│   │   │   │   ├── MainScreen.kt
-│   │   │   │   ├── EditorScreen.kt
-│   │   │   │   └── FreeDrawingScreen.kt
-│   │   │   └── theme/
-│   │   │       ├── Theme.kt
-│   │   │       ├── Color.kt
-│   │   │       └── Type.kt
-│   └── AndroidManifest.xml
-├── build.gradle.kts
-└── README.md
-```
-
-## Compilación
+## Compilar
 
 ```bash
+cd packages/led-screen-android
 ./gradlew build
-```
-
-## Instalar en device
-
-```bash
 ./gradlew installDebug
 ```
 
-## Stack técnico
+## Funcionalidades
 
-- **Kotlin** - Lenguaje principal
-- **Jetpack Compose** - UI moderna declarativa
-- **Canvas** - Dibujo y gráficos
-- **GSON** - Serialización JSON
+### Editor
+- Grilla 32x18 píxeles
+- Herramientas: pincel (✏️), borrador (🧹)
+- 12 colores + selector personalizado
+- Guardar como PNG
+
+### Dibujo Libre
+- Canvas sin restricciones
+- Fotogramas para animaciones
+- Reproducción
+- Exportar como JSON
