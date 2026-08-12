@@ -190,12 +190,14 @@ fun FreeDrawingTab() {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
 
-    var bitmap by remember { mutableStateOf(Bitmap.createBitmap(1024, 576, Bitmap.Config.ARGB_8888)) }
-    var brushColor by remember { mutableStateOf("#FF0000") }
-    var brushSize by remember { mutableStateOf(3f) }
-    var isDrawing by remember { mutableStateOf(false) }
-    val canvas = Canvas(bitmap)
-    canvas.drawColor(Color.BLACK)
+    var bitmap by remember { mutableStateOf(Bitmap.createBitmap(800, 600, Bitmap.Config.ARGB_8888)) }
+    var brushColor by remember { mutableStateOf(Color.parseColor("#FF0000")) }
+    var brushSize by remember { mutableStateOf(5f) }
+
+    LaunchedEffect(Unit) {
+        val canvas = Canvas(bitmap)
+        canvas.drawColor(Color.BLACK)
+    }
 
     Column(
         modifier = Modifier
@@ -203,48 +205,71 @@ fun FreeDrawingTab() {
             .background(ComposeColor(0xFF0a0a0a))
             .padding(8.dp)
     ) {
-        // Canvas
-        Box(
+        // Canvas con dibujo
+        AndroidView(
+            factory = { ctx ->
+                object : android.view.View(ctx) {
+                    override fun onDraw(canvas: android.graphics.Canvas) {
+                        super.onDraw(canvas)
+                        canvas.drawBitmap(bitmap, 0f, 0f, null)
+                    }
+                }.apply {
+                    setOnTouchListener { _, event ->
+                        val paint = android.graphics.Paint().apply {
+                            color = brushColor
+                            strokeWidth = brushSize
+                            strokeCap = android.graphics.Paint.Cap.ROUND
+                        }
+                        when (event.action) {
+                            android.view.MotionEvent.ACTION_DOWN,
+                            android.view.MotionEvent.ACTION_MOVE -> {
+                                val canvas = Canvas(bitmap)
+                                canvas.drawPoint(event.x, event.y, paint)
+                                invalidate()
+                            }
+                        }
+                        true
+                    }
+                }
+            },
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .background(ComposeColor(0xFF1a1a1a))
                 .border(2.dp, ComposeColor(0xFFFF0000))
-        ) {
-            Text("Canvas para dibujar libre", color = ComposeColor.White, modifier = Modifier.align(Alignment.Center))
-        }
+        )
 
-        // Controls
+        // Controles
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(ComposeColor(0xFF1a1a1a))
                 .padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Pincel", fontSize = 11.sp, color = ComposeColor(0xFFFF0000))
+                Text("Color", fontSize = 10.sp, color = ComposeColor(0xFFFF0000))
                 Button(
-                    onClick = {},
+                    onClick = { brushColor = Color.parseColor("#FF0000") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(40.dp)
-                        .background(ComposeColor(android.graphics.Color.parseColor(brushColor)))
+                        .height(35.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = ComposeColor(0xFFFF0000))
                 ) {}
             }
 
             Column(modifier = Modifier.weight(1f)) {
-                Text("Fotogramas (${state.frames.size})", fontSize = 11.sp, color = ComposeColor(0xFFFF0000))
-                ActionButton("Guardar") {}
-                ActionButton("Reproducir") {}
+                Text("Tamaño", fontSize = 10.sp, color = ComposeColor(0xFFFF0000))
+                Text("${brushSize.toInt()}px", fontSize = 9.sp, color = ComposeColor.White)
             }
 
             Column(modifier = Modifier.weight(1f)) {
-                Text("Acciones", fontSize = 11.sp, color = ComposeColor(0xFFFF0000))
+                Text("Acciones", fontSize = 10.sp, color = ComposeColor(0xFFFF0000))
                 ActionButton("Limpiar") {
+                    val canvas = Canvas(bitmap)
+                    canvas.drawColor(Color.BLACK)
                     viewModel.clearFrames()
                 }
-                ActionButton("Exportar") {}
             }
         }
     }
