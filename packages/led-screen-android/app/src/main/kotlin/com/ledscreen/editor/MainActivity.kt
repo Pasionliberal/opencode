@@ -154,7 +154,7 @@ fun EditorTab() {
                 viewModel.setTool("eraser")
             }
 
-            Text("Colores", fontSize = 11.sp, color = ComposeColor(0xFFFF0000), modifier = Modifier.paddingFromBaseline(12.dp))
+            Text("Colores", fontSize = 11.sp, color = ComposeColor(0xFFFF0000), modifier = Modifier.padding(top = 12.dp))
             val colors = listOf(
                 "#FF0000", "#00FF00", "#0000FF", "#FFFF00",
                 "#FF00FF", "#00FFFF", "#FFA500", "#800080",
@@ -173,7 +173,7 @@ fun EditorTab() {
                 }
             }
 
-            Text("Acciones", fontSize = 11.sp, color = ComposeColor(0xFFFF0000), modifier = Modifier.paddingFromBaseline(12.dp))
+            Text("Acciones", fontSize = 11.sp, color = ComposeColor(0xFFFF0000), modifier = Modifier.padding(top = 12.dp))
             ActionButton("Limpiar") {
                 viewModel.clearCanvas()
             }
