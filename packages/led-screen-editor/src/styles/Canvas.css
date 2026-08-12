@@ -1,0 +1,33 @@
+.canvas-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0a;
+  border-radius: 8px;
+  overflow: auto;
+}
+
+.led-canvas {
+  cursor: crosshair;
+  background: #1a1a1a;
+  border: 2px solid #ff0000;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.3), inset 0 0 20px rgba(255, 0, 0, 0.1);
+  image-rendering: pixelated;
+  touch-action: none;
+}
+
+.led-canvas:hover {
+  box-shadow: 0 0 30px rgba(255, 0, 0, 0.5), inset 0 0 20px rgba(255, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .canvas-container {
+    min-height: 300px;
+  }
+
+  .led-canvas {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
