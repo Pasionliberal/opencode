@@ -3,8 +3,6 @@ name: Android Build
 on:
   push:
     branches: [ claude/led-screen-app-075o8a ]
-    paths:
-      - 'packages/led-screen-android/**'
 
 jobs:
   build:
@@ -19,8 +17,27 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Build with Gradle
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Debug
       working-directory: packages/led-screen-android
       run: |
+        echo "=== Gradle Version ==="
         gradle --version
-        gradle assembleDebug -v
+        echo "=== Project Structure ==="
+        ls -la
+        echo "=== App Build.gradle ==="
+        cat app/build.gradle.kts
+
+    - name: Build
+      working-directory: packages/led-screen-android
+      run: gradle assembleDebug 2>&1 || true
+
+    - name: Show Errors
+      if: failure()
+      working-directory: packages/led-screen-android
+      run: |
+        echo "=== Build Output ==="
+        cat build/reports/problems/problems-report.html 2>/dev/null || echo "No problems report"
+        find . -name "*.log" -type f -exec cat {} \;
