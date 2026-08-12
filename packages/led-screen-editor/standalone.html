@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LED Screen Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #0a0a0a;
+            color: #fff;
+        }
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            padding: 1rem;
+            border-bottom: 2px solid #ff0000;
+            box-shadow: 0 2px 10px rgba(255, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ff0000;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        .section-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tab {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 2px solid #333;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .tab:hover {
+            border-color: #ff0000;
+            color: #ff0000;
+        }
+
+        .tab.active {
+            background: #ff0000;
+            border-color: #ff0000;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+        }
+
+        .main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            background: #1a1a1a;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #333;
+            min-width: 220px;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+
+        .toolbar-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toolbar-section h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ff0000;
+            margin-bottom: 0.5rem;
+        }
+
+        .tools {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+
+        .tool-btn {
+            padding: 0.75rem;
+            background: #2a2a2a;
+            border: 2px solid #333;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tool-btn:hover {
+            background: #3a3a3a;
+            border-color: #ff0000;
+        }
+
+        .tool-btn.active {
+            background: #ff0000;
+            border-color: #ff0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .color-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #333;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .color-btn:hover {
+            border-color: #fff;
+            transform: scale(1.05);
+        }
+
+        .color-btn.active {
+            border-color: #fff;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .color-picker {
+            width: 100%;
+            height: 40px;
+            border: 2px solid #333;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .action-btn {
+            padding: 0.75rem;
+            background: #2a2a2a;
+            border: 2px solid #ff0000;
+            border-radius: 4px;
+            color: #ff0000;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .action-btn:hover {
+            background: #ff0000;
+            color: #000;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+        }
+
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0a0a0a;
+            border-radius: 8px;
+            overflow: auto;
+        }
+
+        .led-canvas {
+            cursor: crosshair;
+            background: #1a1a1a;
+            border: 2px solid #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3), inset 0 0 20px rgba(255, 0, 0, 0.1);
+            image-rendering: pixelated;
+            touch-action: none;
+        }
+
+        .led-canvas:hover {
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.5), inset 0 0 20px rgba(255, 0, 0, 0.1);
+        }
+
+        .free-drawing {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .free-drawing-canvas-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1a1a1a;
+            border-radius: 8px;
+            border: 2px solid #ff0000;
+            overflow: auto;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3), inset 0 0 20px rgba(255, 0, 0, 0.1);
+        }
+
+        .free-canvas {
+            cursor: crosshair;
+            touch-action: none;
+            image-rendering: pixelated;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .free-drawing-controls {
+            display: flex;
+            gap: 1rem;
+            background: #1a1a1a;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #333;
+            overflow-x: auto;
+        }
+
+        .controls-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .controls-section h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ff0000;
+            margin-bottom: 0.25rem;
+        }
+
+        .brush-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .brush-controls label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .brush-controls input[type="color"] {
+            width: 50px;
+            height: 40px;
+            border: 2px solid #333;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .brush-controls input[type="range"] {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .main {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 0.5rem;
+            }
+
+            .toolbar {
+                min-width: auto;
+                max-height: none;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>LED Screen Editor</h1>
+            <div class="section-tabs">
+                <button class="tab active" data-section="editor">Editor</button>
+                <button class="tab" data-section="free-draw">Dibujo Libre</button>
+            </div>
+        </header>
+
+        <main class="main">
+            <div id="editor-section" class="editor-section">
+                <div class="toolbar">
+                    <div class="toolbar-section">
+                        <h3>Herramientas</h3>
+                        <div class="tools">
+                            <button class="tool-btn active" data-tool="pen" title="Pincel">✏️</button>
+                            <button class="tool-btn" data-tool="eraser" title="Borrador">🧹</button>
+                            <button class="tool-btn" data-tool="line" title="Línea">📏</button>
+                            <button class="tool-btn" data-tool="rectangle" title="Rectángulo">▭</button>
+                            <button class="tool-btn" data-tool="circle" title="Círculo">◯</button>
+                        </div>
+                    </div>
+
+                    <div class="toolbar-section">
+                        <h3>Colores</h3>
+                        <div class="color-grid">
+                            <button class="color-btn active" style="background-color: #FF0000;" data-color="#FF0000"></button>
+                            <button class="color-btn" style="background-color: #00FF00;" data-color="#00FF00"></button>
+                            <button class="color-btn" style="background-color: #0000FF;" data-color="#0000FF"></button>
+                            <button class="color-btn" style="background-color: #FFFF00;" data-color="#FFFF00"></button>
+                            <button class="color-btn" style="background-color: #FF00FF;" data-color="#FF00FF"></button>
+                            <button class="color-btn" style="background-color: #00FFFF;" data-color="#00FFFF"></button>
+                            <button class="color-btn" style="background-color: #FFA500;" data-color="#FFA500"></button>
+                            <button class="color-btn" style="background-color: #800080;" data-color="#800080"></button>
+                            <button class="color-btn" style="background-color: #FFC0CB;" data-color="#FFC0CB"></button>
+                            <button class="color-btn" style="background-color: #A52A2A;" data-color="#A52A2A"></button>
+                            <button class="color-btn" style="background-color: #808080;" data-color="#808080"></button>
+                            <button class="color-btn" style="background-color: #FFFFFF;" data-color="#FFFFFF"></button>
+                        </div>
+                        <input type="color" id="colorPicker" class="color-picker" value="#FF0000">
+                    </div>
+
+                    <div class="toolbar-section">
+                        <h3>Acciones</h3>
+                        <button class="action-btn" id="clearBtn">Limpiar todo</button>
+                        <button class="action-btn" id="downloadBtn">Descargar</button>
+                    </div>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="ledCanvas" class="led-canvas"></canvas>
+                </div>
+            </div>
+
+            <div id="free-draw-section" class="free-drawing hidden">
+                <div class="free-drawing-canvas-wrapper">
+                    <canvas id="freeCanvas" class="free-canvas"></canvas>
+                </div>
+
+                <div class="free-drawing-controls">
+                    <div class="controls-section">
+                        <h3>Pincel</h3>
+                        <div class="brush-controls">
+                            <label>
+                                Color:
+                                <input type="color" id="freeBrushColor" value="#FF0000">
+                            </label>
+                            <label>
+                                Tamaño: <span id="brushSizeDisplay">3</span>px
+                                <input type="range" id="brushSize" min="1" max="20" value="3">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="controls-section">
+                        <h3>Fotogramas (<span id="frameCount">0</span>)</h3>
+                        <button class="action-btn" id="saveFrameBtn">Guardar fotograma</button>
+                        <button class="action-btn" id="playBtn">Reproducir</button>
+                    </div>
+
+                    <div class="controls-section">
+                        <h3>Acciones</h3>
+                        <button class="action-btn" id="clearFreeBtn" style="border-color: #ff3333; color: #ff3333;">Limpiar</button>
+                        <button class="action-btn" id="downloadAnimBtn">Descargar animación</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const GRID_WIDTH = 32;
+        const GRID_HEIGHT = 18;
+        const PIXEL_SIZE = 30;
+
+        let currentTool = 'pen';
+        let currentColor = '#FF0000';
+        let pixels = new Map();
+        let isDrawing = false;
+
+        const ledCanvas = document.getElementById('ledCanvas');
+        const ctx = ledCanvas.getContext('2d');
+        ledCanvas.width = GRID_WIDTH * PIXEL_SIZE;
+        ledCanvas.height = GRID_HEIGHT * PIXEL_SIZE;
+
+        // Editor functions
+        function drawCanvas() {
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, ledCanvas.width, ledCanvas.height);
+
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+
+            for (let i = 0; i <= GRID_WIDTH; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * PIXEL_SIZE, 0);
+                ctx.lineTo(i * PIXEL_SIZE, GRID_HEIGHT * PIXEL_SIZE);
+                ctx.stroke();
+            }
+
+            for (let i = 0; i <= GRID_HEIGHT; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, i * PIXEL_SIZE);
+                ctx.lineTo(GRID_WIDTH * PIXEL_SIZE, i * PIXEL_SIZE);
+                ctx.stroke();
+            }
+
+            pixels.forEach((color, key) => {
+                const [x, y] = key.split(',').map(Number);
+                ctx.fillStyle = color;
+                ctx.fillRect(x * PIXEL_SIZE + 1, y * PIXEL_SIZE + 1, PIXEL_SIZE - 2, PIXEL_SIZE - 2);
+            });
+        }
+
+        function getPixelCoords(clientX, clientY) {
+            const rect = ledCanvas.getBoundingClientRect();
+            const x = Math.floor((clientX - rect.left) / PIXEL_SIZE);
+            const y = Math.floor((clientY - rect.top) / PIXEL_SIZE);
+
+            if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT) {
+                return null;
+            }
+
+            return { x, y };
+        }
+
+        ledCanvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            const coords = getPixelCoords(e.clientX, e.clientY);
+            if (!coords) return;
+
+            if (currentTool === 'pen') {
+                pixels.set(`${coords.x},${coords.y}`, currentColor);
+            } else if (currentTool === 'eraser') {
+                pixels.delete(`${coords.x},${coords.y}`);
+            }
+            drawCanvas();
+        });
+
+        ledCanvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            const coords = getPixelCoords(e.clientX, e.clientY);
+            if (!coords) return;
+
+            if (currentTool === 'pen') {
+                pixels.set(`${coords.x},${coords.y}`, currentColor);
+            } else if (currentTool === 'eraser') {
+                pixels.delete(`${coords.x},${coords.y}`);
+            }
+            drawCanvas();
+        });
+
+        ledCanvas.addEventListener('mouseup', () => { isDrawing = false; });
+        ledCanvas.addEventListener('mouseleave', () => { isDrawing = false; });
+
+        // Tool selection
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTool = btn.dataset.tool;
+            });
+        });
+
+        // Color selection
+        document.querySelectorAll('.color-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentColor = btn.dataset.color;
+                document.getElementById('colorPicker').value = currentColor;
+            });
+        });
+
+        document.getElementById('colorPicker').addEventListener('change', (e) => {
+            currentColor = e.target.value;
+            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+        });
+
+        // Actions
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            pixels.clear();
+            drawCanvas();
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1280;
+            canvas.height = 720;
+            const c = canvas.getContext('2d');
+
+            c.fillStyle = '#000000';
+            c.fillRect(0, 0, canvas.width, canvas.height);
+
+            const pixelSize = 40;
+            pixels.forEach((color, key) => {
+                const [x, y] = key.split(',').map(Number);
+                c.fillStyle = color;
+                c.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+            });
+
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'led-screen.png';
+            link.click();
+        });
+
+        // Section tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const section = tab.dataset.section;
+                document.getElementById('editor-section').classList.toggle('hidden', section !== 'editor');
+                document.getElementById('free-draw-section').classList.toggle('hidden', section !== 'free-draw');
+            });
+        });
+
+        // Free drawing
+        const freeCanvas = document.getElementById('freeCanvas');
+        const freeCtx = freeCanvas.getContext('2d');
+        freeCanvas.width = 1024;
+        freeCanvas.height = 576;
+
+        let freeIsDrawing = false;
+        let frames = [];
+        let brushColor = '#FF0000';
+        let brushSize = 3;
+
+        freeCtx.fillStyle = '#000000';
+        freeCtx.fillRect(0, 0, freeCanvas.width, freeCanvas.height);
+
+        freeCanvas.addEventListener('mousedown', (e) => {
+            freeIsDrawing = true;
+            const rect = freeCanvas.getBoundingClientRect();
+            freeCtx.beginPath();
+            freeCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        });
+
+        freeCanvas.addEventListener('mousemove', (e) => {
+            if (!freeIsDrawing) return;
+            const rect = freeCanvas.getBoundingClientRect();
+            freeCtx.lineWidth = brushSize;
+            freeCtx.lineCap = 'round';
+            freeCtx.lineJoin = 'round';
+            freeCtx.strokeStyle = brushColor;
+            freeCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            freeCtx.stroke();
+        });
+
+        freeCanvas.addEventListener('mouseup', () => { freeIsDrawing = false; });
+        freeCanvas.addEventListener('mouseleave', () => { freeIsDrawing = false; });
+
+        document.getElementById('freeBrushColor').addEventListener('change', (e) => {
+            brushColor = e.target.value;
+        });
+
+        document.getElementById('brushSize').addEventListener('input', (e) => {
+            brushSize = parseInt(e.target.value);
+            document.getElementById('brushSizeDisplay').textContent = brushSize;
+        });
+
+        document.getElementById('clearFreeBtn').addEventListener('click', () => {
+            freeCtx.fillStyle = '#000000';
+            freeCtx.fillRect(0, 0, freeCanvas.width, freeCanvas.height);
+            frames = [];
+            document.getElementById('frameCount').textContent = '0';
+        });
+
+        document.getElementById('saveFrameBtn').addEventListener('click', () => {
+            const imageData = freeCtx.getImageData(0, 0, freeCanvas.width, freeCanvas.height);
+            frames.push(imageData);
+            document.getElementById('frameCount').textContent = frames.length;
+        });
+
+        document.getElementById('playBtn').addEventListener('click', () => {
+            if (frames.length === 0) return;
+            let frameIndex = 0;
+            const interval = setInterval(() => {
+                freeCtx.putImageData(frames[frameIndex], 0, 0);
+                frameIndex = (frameIndex + 1) % frames.length;
+            }, 200);
+
+            setTimeout(() => clearInterval(interval), 5000);
+        });
+
+        document.getElementById('downloadAnimBtn').addEventListener('click', () => {
+            if (frames.length === 0) return;
+
+            const data = {
+                frames: frames.map(f => {
+                    const c = document.createElement('canvas');
+                    c.width = f.width;
+                    c.height = f.height;
+                    const ctx = c.getContext('2d');
+                    ctx.putImageData(f, 0, 0);
+                    return c.toDataURL('image/png');
+                }),
+                frameCount: frames.length,
+                timestamp: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'led-animation.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        drawCanvas();
+    </script>
+</body>
+</html>
