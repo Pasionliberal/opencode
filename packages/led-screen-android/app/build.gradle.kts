@@ -1,6 +1,6 @@
 plugins {
-    id("com.android.application") version "8.2.0"
-    kotlin("android") version "1.9.21"
+    id("com.android.application")
+    kotlin("android")
 }
 
 android {
@@ -18,6 +18,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 
