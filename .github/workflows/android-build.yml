@@ -1,0 +1,52 @@
+name: Android Build
+
+on:
+  push:
+    branches: [ claude/led-screen-app-075o8a ]
+    paths:
+      - 'packages/led-screen-android/**'
+  pull_request:
+    branches: [ claude/led-screen-app-075o8a ]
+    paths:
+      - 'packages/led-screen-android/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Build Android App
+      working-directory: packages/led-screen-android
+      run: |
+        chmod +x gradlew
+        ./gradlew build
+
+    - name: Build APK
+      working-directory: packages/led-screen-android
+      run: ./gradlew assembleDebug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: led-screen-editor.apk
+        path: packages/led-screen-android/app/build/outputs/apk/debug/app-debug.apk
+
+    - name: Build Report
+      if: always()
+      working-directory: packages/led-screen-android
+      run: |
+        if [ -d "build/reports/androidTests" ]; then
+          echo "Test reports available"
+        fi
