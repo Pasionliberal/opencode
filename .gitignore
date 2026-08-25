@@ -26,6 +26,13 @@ target
 .scripts
 .direnv/
 
+# Android / Gradle
+.gradle/
+build/
+*.apk
+*.ap_
+*.dex
+
 # Local dev files
 opencode-dev
 UPCOMING_CHANGELOG.md
